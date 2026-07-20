@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Log Processing Platform</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <main class="container">
+      <header class="hero">
+        <h1>Log Processing Platform</h1>
+        <p>Generate sample logs, inspect recent events, and focus on ERROR traffic in one place.</p>
+      </header>
+
+      <section class="card">
+        <div class="controls">
+          <button id="sample-log" type="button">Generate random sample log</button>
+          <button id="refresh-all" type="button">Display all logs</button>
+          <button id="refresh-errors" type="button">Display ERROR logs</button>
+          <button id="health-check" type="button">Show backend health</button>
+        </div>
+
+        <form id="log-form" class="form-grid">
+          <label>
+            Hostname
+            <input id="hostname" name="hostname" required />
+          </label>
+          <label>
+            Application
+            <input id="application" name="application" required />
+          </label>
+          <label>
+            Severity
+            <select id="severity" name="severity" required>
+              <option value="INFO">INFO</option>
+              <option value="WARNING">WARNING</option>
+              <option value="ERROR">ERROR</option>
+              <option value="DEBUG">DEBUG</option>
+            </select>
+          </label>
+          <label>
+            Message
+            <input id="message" name="message" required />
+          </label>
+          <button class="submit-btn" type="submit">Submit log</button>
+        </form>
+      </section>
+
+      <section class="card">
+        <div class="status-row">
+          <h2 id="logs-title">All logs</h2>
+          <span id="status" class="status">Loading logs…</span>
+        </div>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Hostname</th>
+                <th>Application</th>
+                <th>Severity</th>
+                <th>Message</th>
+                <th>Timestamp</th>
+              </tr>
+            </thead>
+            <tbody id="log-table-body"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <script src="/config.js"></script>
+    <script src="/app.js"></script>
+  </body>
+</html>

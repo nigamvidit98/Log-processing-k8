@@ -1,0 +1,16 @@
+services:
+  backend:
+    build:
+      context: ./backend
+    container_name: log-backend
+    ports:
+      - "3100:8000"
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: log-frontend
+    ports:
+      - "3101:80"
+    depends_on:
+      - backend
