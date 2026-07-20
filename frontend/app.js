@@ -4,6 +4,7 @@ const logTableBody = document.getElementById('log-table-body');
 const logsTitle = document.getElementById('logs-title');
 const refreshAllButton = document.getElementById('refresh-all');
 const refreshErrorsButton = document.getElementById('refresh-errors');
+const clearLogsButton = document.getElementById('clear-logs');
 const sampleLogButton = document.getElementById('sample-log');
 const healthButton = document.getElementById('health-check');
 
@@ -138,6 +139,16 @@ refreshAllButton.addEventListener('click', async () => {
 refreshErrorsButton.addEventListener('click', async () => {
   currentView = 'errors';
   await loadLogs('/logs/error', 'ERROR logs');
+});
+
+clearLogsButton.addEventListener('click', async () => {
+  try {
+    await requestJson('/logs', { method: 'DELETE' });
+    setStatus('All logs deleted.');
+    await loadLogs('/logs', 'All logs');
+  } catch (error) {
+    setStatus(error.message, true);
+  }
 });
 
 healthButton.addEventListener('click', showHealthStatus);

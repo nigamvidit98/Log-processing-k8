@@ -52,6 +52,13 @@ def get_logs() -> list[dict[str, Any]]:
     return LOG_STORE
 
 
+@app.delete("/logs")
+def delete_logs() -> dict[str, str]:
+    """Remove all stored logs."""
+    LOG_STORE.clear()
+    return {"message": "All logs deleted"}
+
+
 @app.get("/logs/error")
 def get_error_logs() -> list[dict[str, Any]]:
     """Return only logs whose severity is ERROR."""
