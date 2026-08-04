@@ -1,0 +1,73 @@
+# This manifest demonstrates the Sidecar pattern.
+# A sidecar is a helper container that runs alongside the main application
+# container to extend its functionality, such as logging, proxying, or monitoring.
+apiVersion: v1
+kind: Pod
+metadata:
+  # The Pod name should describe the sidecar purpose.
+  name: fastapi-sidecar-pod
+  # Keep the workload in the learning namespace.
+  namespace: log-processing
+  labels:
+    app: fastapi-backend
+    component: backend
+    role: sidecar
+    environment: development
+  annotations:
+    description: "Sidecar pattern example with FastAPI and a log-writing sidecar"
+    app.kubernetes.io/name: fastapi-backend
+    app.kubernetes.io/part-of: log-processing-k8
+spec:
+  # Keep the Pod running even if one container exits unexpectedly.
+  restartPolicy: Always
+  # Shared storage lets the sidecar and main container work with the same files.
+  volumes:
+    - name: shared-logs
+      emptyDir: {}
+  containers:
+    # The main FastAPI backend container.
+    - name: fastapi-backend
+      image: log-processing-k8-backend:latest
+      imagePullPolicy: IfNotPresent
+      ports:
+        - containerPort: 8000
+          name: http
+          protocol: TCP
+      env:
+        - name: PYTHONUNBUFFERED
+          value: "1"
+      # Mount the shared volume so the app can use the same directory as the sidecar.
+      volumeMounts:
+        - name: shared-logs
+          mountPath: /var/log/app
+      resources:
+        requests:
+          cpu: 100m
+          memory: 128Mi
+        limits:
+          cpu: 500m
+          memory: 256Mi
+
+    # The sidecar container writes timestamped log messages continuously.
+    - name: log-sidecar
+      image: busybox:1.36
+      imagePullPolicy: IfNotPresent
+      # This loop writes a timestamped message into the shared log directory.
+      command: ["sh", "-c"]
+      args:
+        - |
+          while true; do
+            echo "$(date -u +'%Y-%m-%dT%H:%M:%SZ') sidecar log" >> /var/log/app/app.log;
+            sleep 5;
+          done
+      # Mount the same shared volume so the sidecar can write logs there.
+      volumeMounts:
+        - name: shared-logs
+          mountPath: /var/log/app
+      resources:
+        requests:
+          cpu: 50m
+          memory: 32Mi
+        limits:
+          cpu: 100m
+          memory: 64Mi

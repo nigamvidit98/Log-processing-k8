@@ -1,0 +1,59 @@
+# The Kubernetes API version for a Pod resource.
+apiVersion: v1
+# The resource type we are creating: a single Pod.
+kind: Pod
+# Metadata describing the Pod, including its name and labels.
+metadata:
+  # The name of the Pod. This should be unique within the namespace.
+  name: fastapi-backend-pod
+  # Run this Pod in the dedicated namespace.
+  namespace: log-processing
+  # Labels are key/value pairs used to organize and select resources.
+  labels:
+    # A simple app label for identifying this workload.
+    app: fastapi-backend
+    # A component label to show this Pod is the backend part of the app.
+    component: backend
+    # A development label to make the intent clear for local learning.
+    environment: development
+  # Annotations are metadata that can be used for documentation or tooling.
+  annotations:
+    # A human-readable description of the Pod.
+    description: "Single Pod for the FastAPI backend used in local Kubernetes learning"
+    # A common label-style annotation for tooling and ownership.
+    app.kubernetes.io/name: fastapi-backend
+    # The part of the application this Pod belongs to.
+    app.kubernetes.io/part-of: log-processing-k8
+# The desired state of the Pod.
+spec:
+  # Restart policy for the container. Always is the default for Pods with one container.
+  restartPolicy: Always
+  # A list of containers that should run inside this Pod.
+  containers:
+    # The container definition for the FastAPI backend.
+    - name: fastapi-backend
+      # The Docker image to run. This should match the image built for the backend.
+      image: log-processing-k8-backend:latest
+      # Use IfNotPresent for local development so Kubernetes uses the local image when available.
+      imagePullPolicy: IfNotPresent
+      # Ports exposed by the container.
+      ports:
+        # The application listens on port 8000.
+        - containerPort: 8000
+          # A friendly name for the port.
+          name: http
+          # The transport protocol.
+          protocol: TCP
+      # Environment variables for the container.
+      env:
+        # Ensure Python output is unbuffered for easier container logs.
+        - name: PYTHONUNBUFFERED
+          value: "1"
+      # Basic resource requests and limits for a learning project.
+      resources:
+        requests:
+          cpu: 100m
+          memory: 128Mi
+        limits:
+          cpu: 500m
+          memory: 256Mi
